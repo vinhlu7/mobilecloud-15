@@ -47,6 +47,8 @@ public class ContentProviderTimeoutCache
      * timeout parameter and initialises local variables.
      * 
      * @param context
+     * @param timeout
+     *            in seconds
      */
     public ContentProviderTimeoutCache(Context context) {
         // Store the context.
@@ -196,8 +198,8 @@ public class ContentProviderTimeoutCache
                           List<AcronymExpansion> longForms,
                           long timeout) {
         // Check if the List is not null or empty.
-        if (longForms == null
-            || longForms.isEmpty()) 
+        if (longForms.isEmpty() 
+            || longForms == null) 
             return -1;
 
         // Calculate the Expiration time.
