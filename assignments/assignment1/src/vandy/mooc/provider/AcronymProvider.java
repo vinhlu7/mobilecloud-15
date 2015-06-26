@@ -1,11 +1,15 @@
 package vandy.mooc.provider;
 
+
+
+import vandy.mooc.provider.AcronymContract.AcronymEntry;
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
 /**
@@ -128,7 +132,8 @@ public class AcronymProvider extends ContentProvider {
             // TODO - replace 0 with code that inserts a row in Table
             // and returns the row id.
             long id = 0;
-
+            id = db.insert(AcronymEntry.TABLE_NAME, null, values);
+            
             // Check if a new row is inserted or not.
             if (id > 0)
                 returnUri = 
@@ -178,6 +183,14 @@ public class AcronymProvider extends ContentProvider {
                 // contentValues into the SQLite database.
 
                 // Marks the current transaction as successful.
+            	for (ContentValues value : contentValues) {
+                    final long id =
+                        db.insert(AcronymEntry.TABLE_NAME, //could be wrong
+                                  null,
+                                  value);
+                    if (id != -1)
+                        returnCount++;
+                }
                 db.setTransactionSuccessful();
             } finally {
                 // End a transaction.
@@ -204,7 +217,9 @@ public class AcronymProvider extends ContentProvider {
                         String[] selectionArgs,
                         String sortOrder) {
         Cursor retCursor;
-
+        SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+		queryBuilder.setTables(AcronymEntry.TABLE_NAME);
+        
         // Match the id returned by UriMatcher to query appropriate
         // rows.
         switch (sUriMatcher.match(uri)) {
@@ -212,7 +227,9 @@ public class AcronymProvider extends ContentProvider {
             // TODO -- replace "null" by writing code to query the
             // entire SQLite database based on the parameters passed
             // into the method.
-            retCursor = null;
+            //retCursor = queryBuilder.query(mOpenHelper.getReadableDatabase(),
+    		//		projection, selection, selectionArgs, null, null, sortOrder);
+            
             break;
         case ACRONYM: 
             // Selection clause that matches row id with id passed
@@ -227,13 +244,16 @@ public class AcronymProvider extends ContentProvider {
             // TODO -- replace "null" by writing code to query the
             // SQLite database for the particular rowId based on (a
             // subset of) the parameters passed into the method.
-            retCursor = null;
+            //retCursor = queryBuilder.appendWhere(rowId);
+            queryBuilder.appendWhere(rowId);
             break;
         default:
             throw new UnsupportedOperationException("Unknown uri: " 
                                                     + uri);
         }
 
+        retCursor = queryBuilder.query(mOpenHelper.getReadableDatabase(),
+				projection, selection, selectionArgs, null, null, sortOrder);
         // Register to watch a content URI for changes.
         retCursor.setNotificationUri(getContext().getContentResolver(), 
                                      uri);
@@ -271,7 +291,10 @@ public class AcronymProvider extends ContentProvider {
             // TODO -- replace "0" with a call to the SQLite database
             // to update the row(s) in the database based on the
             // parameters passed into this method.
-            rowsUpdated = 0;
+            rowsUpdated = db.update(AcronymEntry.TABLE_NAME, 
+    		        values, 
+    		        selection,
+    		        selectionArgs);;
             break;
         default:
             throw new UnsupportedOperationException("Unknown uri: " 
@@ -315,7 +338,9 @@ public class AcronymProvider extends ContentProvider {
             // TODO -- replace "0" with code that deletes the row(s)
             // in the SQLite database table based on the parameters
             // passed into the method.
-            rowsDeleted = 0;
+            rowsDeleted = db.delete(AcronymEntry.TABLE_NAME,
+  	              selection,
+  		        selectionArgs);;
             break;
         default:
             throw new UnsupportedOperationException("Unknown uri: " 
