@@ -132,7 +132,7 @@ public class AcronymProvider extends ContentProvider {
             // TODO - replace 0 with code that inserts a row in Table
             // and returns the row id.
             long id = 0;
-            id = db.insert(AcronymEntry.TABLE_NAME, null, values);
+            id = db.insert(AcronymContract.AcronymEntry.TABLE_NAME, null, values);
             
             // Check if a new row is inserted or not.
             if (id > 0)
@@ -185,7 +185,7 @@ public class AcronymProvider extends ContentProvider {
                 // Marks the current transaction as successful.
             	for (ContentValues value : contentValues) {
                     final long id =
-                        db.insert(AcronymEntry.TABLE_NAME, //could be wrong
+                        db.insert(AcronymContract.AcronymEntry.TABLE_NAME, 
                                   null,
                                   value);
                     if (id != -1)
@@ -229,7 +229,15 @@ public class AcronymProvider extends ContentProvider {
             // into the method.
             //retCursor = queryBuilder.query(mOpenHelper.getReadableDatabase(),
     		//		projection, selection, selectionArgs, null, null, sortOrder);
-            
+            retCursor = 
+    			mOpenHelper.getReadableDatabase().query
+    			(AcronymContract.AcronymEntry.TABLE_NAME,
+    			projection,
+    			selection,
+    			selectionArgs,
+    			null,
+    			null,
+    			sortOrder);
             break;
         case ACRONYM: 
             // Selection clause that matches row id with id passed
@@ -245,15 +253,25 @@ public class AcronymProvider extends ContentProvider {
             // SQLite database for the particular rowId based on (a
             // subset of) the parameters passed into the method.
             //retCursor = queryBuilder.appendWhere(rowId);
-            queryBuilder.appendWhere(rowId);
+           // queryBuilder.appendWhere(rowId);
+            retCursor = 
+            		mOpenHelper.getReadableDatabase().query
+            		(AcronymContract.AcronymEntry.TABLE_NAME,
+            		projection,
+            		rowId,
+            		null,
+            		null,
+            		null,
+            		sortOrder);
+            		
             break;
         default:
             throw new UnsupportedOperationException("Unknown uri: " 
                                                     + uri);
         }
 
-        retCursor = queryBuilder.query(mOpenHelper.getReadableDatabase(),
-				projection, selection, selectionArgs, null, null, sortOrder);
+        //retCursor = queryBuilder.query(mOpenHelper.getReadableDatabase(),
+		//		projection, selection, selectionArgs, null, null, sortOrder);
         // Register to watch a content URI for changes.
         retCursor.setNotificationUri(getContext().getContentResolver(), 
                                      uri);
@@ -291,7 +309,7 @@ public class AcronymProvider extends ContentProvider {
             // TODO -- replace "0" with a call to the SQLite database
             // to update the row(s) in the database based on the
             // parameters passed into this method.
-            rowsUpdated = db.update(AcronymEntry.TABLE_NAME, 
+            rowsUpdated = db.update(AcronymContract.AcronymEntry.TABLE_NAME, 
     		        values, 
     		        selection,
     		        selectionArgs);;
@@ -340,7 +358,7 @@ public class AcronymProvider extends ContentProvider {
             // passed into the method.
             rowsDeleted = db.delete(AcronymEntry.TABLE_NAME,
   	              selection,
-  		        selectionArgs);;
+  	              selectionArgs);
             break;
         default:
             throw new UnsupportedOperationException("Unknown uri: " 

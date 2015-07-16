@@ -160,8 +160,10 @@ public class AcronymOps
                 // TODO -- you fill in here, replacying "null" with a
                 // call to the appropriate method on the proxy.
                 //??
-                System.out.println("test");
-                AcronymData result = (AcronymData) mAcronymWebServiceProxy.getAcronymResults(acronym);
+               
+                AcronymData result = (AcronymData) mAcronymWebServiceProxy
+                		.getAcronymResults(acronym)
+                		.get(0);
                         
                 // Get the "long forms" of the acronym expansion.
                 longForms = result.getLfs();
